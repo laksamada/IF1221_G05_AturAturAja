@@ -10,6 +10,14 @@
 /* Deklarasi Rules */
     /* Mulai Permainan */
     startGame :-
+        retractall(pemain(_)),
+        retractall(giliran(_)),
+        retractall(discardTop(_)),
+        retractall(warnaAktif(_)),
+        retractall(arahPermainan(_)),
+        retractall(statusUNI(_)),
+        retractall(kartuPemain(_,_)),
+
         write('Masukkan jumlah pemain: '),
         read(Jumlah),
         inputPemain(Jumlah, [], ListPemain),
@@ -25,20 +33,29 @@
     
     /* Input Pemain */
     inputPemain(0, _, []).
-    inputPemain(N, SudahAda, [Nama|Tail]) :-
+    inputPemain(N, SudahAda, [Nama1|Tail]) :-
 
         N > 0,
         write('Masukkan nama pemain: '),
         read(Nama),
 
-        \+ member(Nama, SudahAda),
+        cekNama(Nama, SudahAda, Nama1),
 
         N1 is N - 1,
         inputPemain(
             N1,
-            [Nama|SudahAda],
+            [Nama1|SudahAda],
             Tail
         ).
+    
+    /* Cek apakah nama sudah ada di list,minta masukan ulang jika sudah ada*/
+    cekNama(Nama,List,Result):-
+        member(Nama,List),
+        write('Nama Sudah Digunakan. Masukkan nama lain: '),
+        read(Nama1),
+        cekNama(Nama1,List,Result).
+    cekNama(Nama,List,Nama):-
+        \+ member(Nama,List).
     
     /*Deck Kartu*/
     deck([
