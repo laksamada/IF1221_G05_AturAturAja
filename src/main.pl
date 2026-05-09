@@ -10,28 +10,17 @@
 /* Deklarasi Rules */
     /* Mulai Permainan */
     startGame :-
-
         write('Masukkan jumlah pemain: '),
         read(Jumlah),
-
         inputPemain(Jumlah, [], ListPemain),
-
         assertz(pemain(ListPemain)),
-
         ListPemain = [First|_],
-
         assertz(giliran(First)),
-
         assertz(arahPermainan(kanan)),
-
         assertz(statusUNI([])),
-
         deck(DeckAwal),
-
         bagiSemua(ListPemain, DeckAwal, DeckSisa),
-
         initDiscard(DeckSisa, _),
-
         write('Game berhasil dimulai.'), nl.
     
     /* Input Pemain */
