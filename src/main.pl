@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Deklarasi Fakta */
     :- dynamic(pemain/1).
     :- dynamic(giliran/1).
@@ -293,3 +294,9 @@
     
     /* Sementara BIAR GA ERROR */
     jalankanEfek(_).
+=======
+:- include('setup.pl').
+:- include('deck.pl').
+:- include('gameplay.pl').
+:- include('ingfo.pl').
+>>>>>>> 3963d3eeebb33f4a54fb648546512512da78a893
