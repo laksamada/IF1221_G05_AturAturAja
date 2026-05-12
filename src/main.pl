@@ -148,15 +148,15 @@
         kartu(biru,reverse),
         kartu(hijau,reverse),
         kartu(kuning,reverse),
-
-        kartu(merah, drawTwo),
-        kartu(biru, drawTwo),
-        kartu(hijau, drawTwo),
-        kartu(kuning, drawTwo),
+        
+        kartu(merah,drawTwp),
+        kartu(biru,drawTwo),
+        kartu(hijau,drawTwp),
+        kartu(kuning,drawTwo),
 
         kartu(hitam,wild),
-        kartu(hitam,mimic),
-        kartu(hitam, drawFour)
+        kartu(hitam,drawFour)
+        kartu(hitam,mimic)
 
     ]).
     
