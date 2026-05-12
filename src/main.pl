@@ -120,7 +120,13 @@
         kartu(hijau,reverse),
         kartu(kuning,reverse),
 
+        kartu(merah,drawTwp),
+        kartu(biru,drawTwo),
+        kartu(hijau,drawTwp),
+        kartu(kuning,drawTwo),
+
         kartu(hitam,wild),
+        kartu(hitam,drawFour)
         kartu(hitam,mimic)
     ]).
     
