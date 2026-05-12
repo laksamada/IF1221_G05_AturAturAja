@@ -28,6 +28,7 @@
   7.2. Permainan beres jika hanya tersisa satu pemain yang belum selesai.*/
 
 /* Deklarasi Fakta */
+/*Bagian ini ngejelasin di bagian mana aja yang bakal berubah fakta-faktanya*/
     :- dynamic(pemain/1).
     :- dynamic(giliran/1).
     :- dynamic(kartuPemain/2).
@@ -39,6 +40,7 @@
 /* Deklarasi Rules */
     /* Mulai Permainan */
     startGame :-
+    /*retractall dulu untuk ngapus semua info soal pemain, giliran, dst. Biar bersih*/
         retractall(pemain(_)),
         retractall(giliran(_)),
         retractall(discardTop(_)),
@@ -51,21 +53,13 @@
         read(Jumlah),
 
         inputPemain(Jumlah, [], ListPemain),
-
         assertz(pemain(ListPemain)),
-
         ListPemain = [First|_],
-
         assertz(giliran(First)),
-
         assertz(arahPermainan(kanan)),
-
         assertz(statusUNI([])),
-
         deck(DeckAwal),
-
         bagiSemua(ListPemain, DeckAwal, DeckSisa),
-
         initDiscard(DeckSisa, _),
 
         write('Game berhasil dimulai.'), nl.
@@ -149,13 +143,13 @@
         kartu(hijau,reverse),
         kartu(kuning,reverse),
         
-        kartu(merah,drawTwp),
+        kartu(merah,drawTwo),
         kartu(biru,drawTwo),
-        kartu(hijau,drawTwp),
+        kartu(hijau,drawTwo),
         kartu(kuning,drawTwo),
 
         kartu(hitam,wild),
-        kartu(hitam,drawFour)
+        kartu(hitam,drawFour),
         kartu(hitam,mimic)
 
     ]).
