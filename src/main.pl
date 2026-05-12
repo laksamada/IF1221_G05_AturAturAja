@@ -16,19 +16,29 @@
         retractall(warnaAktif(_)),
         retractall(arahPermainan(_)),
         retractall(statusUNI(_)),
-        retractall(kartuPemain(_,_)),
+        retractall(kartuPemain(_,_)), %biar ga ada bug pas ngejalanin startgame lagi
 
         write('Masukkan jumlah pemain: '),
         read(Jumlah),
+
         inputPemain(Jumlah, [], ListPemain),
+
         assertz(pemain(ListPemain)),
+
         ListPemain = [First|_],
+
         assertz(giliran(First)),
+
         assertz(arahPermainan(kanan)),
+
         assertz(statusUNI([])),
+
         deck(DeckAwal),
+
         bagiSemua(ListPemain, DeckAwal, DeckSisa),
+
         initDiscard(DeckSisa, _),
+
         write('Game berhasil dimulai.'), nl.
     
     /* Input Pemain */
@@ -38,8 +48,7 @@
         N > 0,
         write('Masukkan nama pemain: '),
         read(Nama),
-
-        cekNama(Nama, SudahAda, Nama1),
+        cekNama(Nama,SudahAda,Nama1),
 
         N1 is N - 1,
         inputPemain(
@@ -47,8 +56,7 @@
             [Nama1|SudahAda],
             Tail
         ).
-    
-    /* Cek apakah nama sudah ada di list,minta masukan ulang jika sudah ada*/
+    /* cek apakah nama sudah ada di list,minta masukan ulang jika sudah ada*/
     cekNama(Nama,List,Result):-
         member(Nama,List),
         write('Nama Sudah Digunakan. Masukkan nama lain: '),
@@ -56,7 +64,6 @@
         cekNama(Nama1,List,Result).
     cekNama(Nama,List,Nama):-
         \+ member(Nama,List).
-    
     /*Deck Kartu*/
     deck([
         kartu(merah,0),
@@ -138,6 +145,11 @@
         assertz(kartuPemain(Pemain, ListBaru)),
         N1 is N - 1,
         bagiKartu(Pemain, SisaDeck, DeckAkhir, N1).
+    ambilKartu:-
+        giliran(P),
+        kartuPemain(P,DeckAwal),
+        bagiKartu(P, DeckAwal, DeckBaru, 1),
+        nextTurn.
     
     /* Bagi Semua Pemain */
     bagiSemua([], Deck, Deck).
@@ -207,8 +219,7 @@
     
     /* Cek Kartu Valid */
     kartuValid(kartu(hitam,_), _).
-    kartuValid(kartu(Warna,_), _) :-
-        warnaAktif(Warna).
+    kartuValid(kartu(Warna,_), kartu(Warna,_)). 
     kartuValid(kartu(_,Jenis), kartu(_,Jenis)).
 
     /* Next Turn */
@@ -225,6 +236,10 @@
         nextPlayer(Tail, X, Y).
     nextPlayer([Last], Last, First) :-
         pemain([First|_]).
+    cekAdaKartu([_|T],X):-
+        cekAdaKartu(T,X).
+    cekAdaKartu([H|_],X):-
+        kartuValid(H,X).
 
     /* Mainkan Kartu */
     mainkanKartu(Index) :-
@@ -268,6 +283,13 @@
         Warna \= hitam,
         retract(warnaAktif(_)),
         assertz(warnaAktif(Warna)).
+    inverse(List, Result) :-
+        inverse_helper(List, [], Result).
+
+    inverse_helper([],List, List).
+
+    inverse_helper([Head|Tail], List, Result) :-
+        inverse_helper(Tail, [Head|List], Result).
     
     /* Sementara BIAR GA ERROR */
     jalankanEfek(_).
