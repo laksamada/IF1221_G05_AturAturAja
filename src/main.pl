@@ -291,23 +291,32 @@
     sumListKartu([kartu(_,Jenis)|Tail],X):-
         sumListKartu(Tail,X1),
         X is X1 + Jenis.
-    insert_sort([X],X).
+    insert_sort([], []).
+    insert_sort([X], [X]).
     insert_sort(X,Y):-
         insert_helper(X,[],Y).
+
     appends([],L,L).
     appends([Head|Tail],L,[Head|Result]):-
         appends(Tail,L,Result).
-    insert_helper([X],[],[X]).
+
     insert_helper([],X,X).
     insert_helper([H|T],List,Y):-
         setat(H,List,Y1),
         insert_helper(T,Y1,Y).
+
     setat(Item,[],[Item]).
+
     setat(Item,[H|T],Result):-
-        Item >= H,
+        Item = N-_,
+        H = M-_,
+        N =< M,
         appends([Item,H],T,Result).
+
     setat(Item,[H|T],[H|Result]):-
-        Item < H,
+        Item = N-_,
+        H = M-_,
+        N > M,
         setat(Item,T,Result).
         
     cekAdaExit:- 
@@ -338,7 +347,7 @@
 
     sort_with_id(N, Ids, S) :-
         pair_lists(N, Ids, P),
-        sort(P, SP),
+        insert_sort(P, SP),
         get_ids(SP, S).
     cekHasil:-
         sumAllPlayer(X),
