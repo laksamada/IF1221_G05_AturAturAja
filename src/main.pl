@@ -1,3 +1,32 @@
+/*Garis besar Alur:
+1. Intro Game
+2. Input Jumlah Pemain
+3. Input Nama Pemain
+4. Sistem otomatis membagikan 7 kartu ke tiap pemain dengan sistem:
+  4.1. Urutan turn dirandomize, tapi bakal konsisten sampai akhir
+  4.2. Turn pertama langsung main, pemain dapat ngeliat kartu sendiri dengan fungsi lihatKartu
+       selama masih turn dia.
+5. Saat game main akan ada discardPile yang menjadi kartu pertama dari tumpukan deck, 
+   (mungkin bakal ada opsi cegah kalau discardPile nya kartu spesial kayak reverse, drawTwo, drawFour, dan mimic)
+6. Algoritma permainan tiap turn:
+  6.1. Kartu masing-masing berkurang 1 tiap turn jika ada yang sesuai, tambah 1 jika tidak ada yang sesuai dengan
+       pengurangan 1 kartu dari deck.
+  6.2. Kartu reverse jika sesuai dapat dipakai untuk membalikkan arah turn misal 1 ke 5 jadi 5 ke 1.
+  6.3. Kartu drawTwo yang menambahkan 2 kartu ke pemain selanjutnya jika warna sama, tak boleh ditumpuk
+  6.4. Kartu drawFour yang menambahkan 4 kartu ke pemain selanjutnya tanpa peduli warna, tak boleh ditumpuk
+  6.5. Kartu skip yang melewati turn pemain selanjutnya
+  6.6. Kartu wild yang dapat mengubah warna untuk turn selanjutnya tanpa peduli warna sekarang, tak boleh ditumpuk
+  6.7. Kartu mimic(bonus) yang dapat menyalin kartu aksi yang terakhir dimainkan tanpa peduli warna,
+       kartu aksi seperti wild, skip, drawTwo, drawFour, dan reverse.
+7. Pemain dengan sisa deck kartu dua terakhir harus menginput uni(2) untuk menyerukan UNI. 
+   Jika tidak maka akan memungkinkan pemain lain untuk menangkap. Jika benar pemain yang ditangkap tidak
+   memiliki satu kartu atau sudah menyerukan UNI maka penangkap akan memakan gilirannya dan yang ditangkap
+   akan dapat dua kartu acak. Jika tidak benar yang ditangkap memenuhi syarat tersebut maka penangkap akan 
+   mendapatkan satu kartu acak.
+8. Algoritma Permainan berakhir:
+  7.1. Pemain selesai ketika deck kartunya habis atau nol.
+  7.2. Permainan beres jika hanya tersisa satu pemain yang belum selesai.*/
+
 /* Deklarasi Fakta */
     :- dynamic(pemain/1).
     :- dynamic(giliran/1).
@@ -120,10 +149,24 @@
         kartu(hijau,reverse),
         kartu(kuning,reverse),
 
+        kartu(merah, drawTwo),
+        kartu(biru, drawTwo),
+        kartu(hijau, drawTwo),
+        kartu(kuning, drawTwo),
+
         kartu(hitam,wild),
-        kartu(hitam,mimic)
+        kartu(hitam,mimic),
+        kartu(hitam, drawFour)
+
     ]).
     
+    /*Mulai Membagikan Kartu*/
+    write('Kartu mulai dibagikan!'),
+    %Algoritma membagikan kartu per turn
+    %Jadi buat turn pertama semua orang itu untuk dibagiin kartu dan ngeliat isinya
+
+
+
     /*Ambil Kartu Random*/
     ambilElemen([H|T], H, T).
     ambilElemen([H|T], X, [H|Sisa]) :-
@@ -293,3 +336,7 @@
     
     /* Sementara BIAR GA ERROR */
     jalankanEfek(_).
+
+
+
+    
