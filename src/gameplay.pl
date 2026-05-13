@@ -58,6 +58,8 @@ ambilKartu :-
     kartuPemain(P, ListLama),
     retract(kartuPemain(P, _)),
     assertz(kartuPemain(P, [KartuBaru|ListLama])),
+/*Penjelasan: kartu baru yang terdapat di head deckAktif akan diambil dan dimasukkan ke List kartu
+pemain di bagian head.*/
 
     write('Kamu ngambil kartu dari deck kartu!'), nl,
     nextTurn.
@@ -72,18 +74,18 @@ jalankanEfek(kartu(_, skip)) :- !,
 
     write('Pemain'), write(Berikutnya), write(' telah di skip, lanjut ke pemain'),
     write(SetelahBerikutnya), nl.
-
-jalankanEfek(_) :- !.
-
+/*Penjelasan: List berisi daftar pemain dan 'Sekarang' menyatakan giliran pemain sekarang.
+Diarah pakai nextPlayer. */
 
 % efek reverse 
-jalankanEfek(kartu(_,reverse)) :- !,
+jalankanEfek(kartu(_,reverse)) :- !, 
     pemain(ListLama),
     reverse(ListLama, ListBaru),
     retract(pemain(_)),
     assertz(pemain(ListBaru)),
     write('KARTU REVERSE DIMAINKAN! URUTAN DIBALIK!'), nl, 
-    write('=> '), write(ListBaru).
+    write('=> '), write(ListBaru). 
+/*Penjelasan: ListLama berisi daftar pemain sekarang, pakai fungsi bawaan reverse buat nuker urutan dengan ListBaru*/
 
 
 
@@ -94,8 +96,8 @@ jalankanEfek(kartu(_,draw_two)) :- !,
     nextPlayer(List, Sekarang, Target),
     tambahKartu(Target, 2),
     write(Target), write(' telah ditambahkan 2 kartu!'), nl.
-
-
+/*Penjelasan: List berisi daftar pemain, 'Sekarang' buat player giliran sekarang. Karena drawTwo narget player selanjutnya
+maka harus diarah make nextPlayer. Dibantu fungsi tambahKartu. */
 
 % efek wild
 jalankanEfek(kartu(hitam,wild)) :-!,
@@ -104,6 +106,7 @@ jalankanEfek(kartu(hitam,wild)) :-!,
     retract(warnaAktif(_)),
     assertz(warnaAktif(WarnaBaru)),
     write('Warna sekarang adalah '), write(WarnaBaru), nl.
+/*Penjelasan: pemain milih warna yang diinginkan dan masukin ke warnaBaru lalu ngeganti isi warnaAktif. */
 
 % efek wild_draw_four
 jalankanEfek(kartu(hitam,draw_four)) :- !,
@@ -118,12 +121,13 @@ jalankanEfek(kartu(hitam,draw_four)) :- !,
     nextPlayer(List, Sekarang, Target),
     tambahKartu(Target, 4),
     write(Target), write(' telah ditambahkan 4 kartu!'), nl.
+/*Penjelasan: kurang lebih gabungan drawTwo sama wild */
 
 jalankanEfek(_) :- !.
 
 /*Daftar Helper*/
 %Helper tambahin kartu
-tambahKartu(_, 0) :- !.
+tambahKartu(_, 0) :- !. /*Berhenti ketika*/
 tambahKartu(Pemain, N) :-
     N > 0,
     retract(deckAktif([H|T])),
@@ -133,9 +137,9 @@ tambahKartu(Pemain, N) :-
     assertz(kartuPemain(Pemain, [H|ListLama])),
     N1 is N - 1,
     tambahKartu(Pemain, N1).
-
+/*Penjelasan: menambahkan kartu sebanyak N ke Pemain.*/
 %Helper ngecek warna
-cekAdaWarna([kartu(Warna, _|_), Warna]) :- !.
+cekAdaWarna([kartu(Warna, _|_), Warna]) :- !. /*Kalo ada warna di head*/
 cekAdaWarna([_|SisaKartu], Warna) :- cekAdaWarna(SisaKartu, Warna).
 
 %Helper ngecek pemain sebelumnya
@@ -161,6 +165,9 @@ eksekusi(_, Target, ListKartu, W) :-
 eksekusi(Penantang, Target, _ , _) :-
     write('Penantang gagal! '), write(Penantang), write(' mendapat 6 kartu acak!'), nl,
     tambahKartu(Penantang, 6).
+/*Penjelasan: Semisal pemain 1 make drawFour, pemain 2 bisa nantang apakah pilihan warna yang dipilih
+oleh pemain 1 sudah ada atau tidak di deck pemain 1 itu sendiri. Kalau ada maka tantangan berhasil.
+Kalau tidak, penantang terkena penalti.*/
 
 
 %UNI
@@ -180,6 +187,8 @@ uni(_) :-
     write(P), write(' mendapatkan penalti 1 kartu acak'),
     tambahKartu(P, 1),
     nextTurn.
+/*Penjelasan: Jika kartu pemain P sisa 2, maka mengucapkan uni. Tergantung valid atau tidak, akan ada penalti.*/
+
 %tangkap
 tangkap(Target) :- 
     kartuPemain(Target, L),
@@ -196,4 +205,7 @@ tangkap(_) :-
     write('Kamu salah tangkap! Mendapatkan penalti 1 kartu'),
     tambahKartu(Penangkap, 1),
     nextTurn.
+/*Penjelasan: Jika pemain sebelumnya belum menyebutkan uni padahal kartunya telah bersisa 1, maka bisa ditangkap.
+Tergantung apakah pemain yang ditangkap telah masuk ke statusUNI atau tidak. Akan ada penalti bagi penangkap jika
+salah.*/
 
