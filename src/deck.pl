@@ -65,10 +65,13 @@ deck([
 ambilIndex(0, [H|T], H, T).
 ambilIndex(N, [H|T], X, [H|Sisa]) :-
     N > 0,
-    N1 is N - 1,
+    N1 is N - 1,panjang([], 0).
+panjang([_|T], Hasil) :-
+    panjang(T, Sisa),
+    Hasil is Sisa + 1.
     ambilIndex(N1, T, X, Sisa).
 ambilElemen(List, Elemen, Sisa) :-
-    length(List, Panjang),
+    panjang(List, Panjang),
     random(0, Panjang, Index),
     ambilIndex(Index, List, Elemen, Sisa).
 
