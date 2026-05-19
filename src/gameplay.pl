@@ -1,3 +1,13 @@
+clearGame :-
+    retractall(pemain(_)),
+    retractall(giliran(_)),
+    retractall(discardTop(_)),
+    retractall(warnaAktif(_)),
+    retractall(arahPermainan(_)),
+    retractall(statusUNI(_)),
+    retractall(kartuPemain(_,_)),
+    retractall(deckAktif(_)).
+
 /* Next Turn */
 nextTurn :-
     pemain(List),
@@ -46,6 +56,19 @@ lanjut:-
     cekAdaExit,!.
 lanjut:-
     nextTurn.
+cekAdaExit:-
+    giliran(X),
+    kartuPemain(X, ListKartu),
+    length(ListKartu, 0), !,nl,
+    write('game selesai'), nl,
+    write('urutan pemain: '), nl,
+    cekHasil,
+    clearGame.
+cekHasil:-
+    sumAllPlayer(X),
+    pemain(Y),
+    sort_with_id(X,Y,R),
+    printList(R).
 
 /* fitur yg belum ada */
 % ambilKartu dari deckAktif */

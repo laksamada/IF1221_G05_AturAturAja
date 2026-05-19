@@ -94,14 +94,7 @@ setat(Item,[H|T],[H|Result]):-
     N > M,
     setat(Item,T,Result).
 
-cekAdaExit:-
-    giliran(X),
-    kartuPemain(X, ListKartu),
-    length(ListKartu, 0), !,nl,
-    write('game selesai'), nl,
-    write('urutan pemain: '), nl,
-    cekHasil,
-    clearGame.
+
 
 sumAll([H|ListPemain],Awal,X):-
     sumPlayer(H,SumKartu),
@@ -128,11 +121,6 @@ sort_with_id(N, Ids, S) :-
     insert_sort(P, SP),
     get_ids(SP, S).
 
-cekHasil:-
-    sumAllPlayer(X),
-    pemain(Y),
-    sort_with_id(X,Y,R),
-    printList(R).
 
 printList([]).
 printList([H|T]):-
