@@ -10,6 +10,9 @@ deck([
     kartu(merah,7),
     kartu(merah,8),
     kartu(merah,9),
+    kartu(merah,draw_two),
+    kartu(merah,skip),
+    kartu(merah,reverse),
 
     kartu(biru,0),
     kartu(biru,1),
@@ -21,6 +24,9 @@ deck([
     kartu(biru,7),
     kartu(biru,8),
     kartu(biru,9),
+    kartu(biru,draw_two),
+    kartu(biru,skip),
+    kartu(biru,reverse),
 
     kartu(hijau,0),
     kartu(hijau,1),
@@ -32,6 +38,9 @@ deck([
     kartu(hijau,7),
     kartu(hijau,8),
     kartu(hijau,9),
+    kartu(hijau,draw_two),
+    kartu(hijau,skip),
+    kartu(hijau,reverse),
 
     kartu(kuning,0),
     kartu(kuning,1),
@@ -43,25 +52,25 @@ deck([
     kartu(kuning,7),
     kartu(kuning,8),
     kartu(kuning,9),
-
-    kartu(merah,skip),
-    kartu(biru,skip),
-    kartu(hijau,skip),
+    kartu(kuning,draw_two),
     kartu(kuning,skip),
-
-    kartu(merah,reverse),
-    kartu(biru,reverse),
-    kartu(hijau,reverse),
     kartu(kuning,reverse),
 
     kartu(hitam,wild),
+    kartu(hitam,wild_draw_four),
     kartu(hitam,mimic)
 ]).
 
 /*Ambil Kartu Random*/
-ambilElemen([H|T], H, T).
-ambilElemen([H|T], X, [H|Sisa]) :-
-    ambilElemen(T, X, Sisa).
+ambilIndex(0, [H|T], H, T).
+ambilIndex(N, [H|T], X, [H|Sisa]) :-
+    N > 0,
+    N1 is N - 1,
+    ambilIndex(N1, T, X, Sisa).
+ambilElemen(List, Elemen, Sisa) :-
+    length(List, Panjang),
+    random(0, Panjang, Index),
+    ambilIndex(Index, List, Elemen, Sisa).
 
 /*Bagi 7 Kartu*/
 bagiKartu(_, Deck, Deck, 0).
@@ -88,11 +97,17 @@ bagiSemua([P|Tail], DeckAwal, DeckAkhir) :-
 
 /* Pilih Discard Awal */
 initDiscard(DeckAwal, DeckAkhir) :-
-    ambilElemen(DeckAwal, Kartu, DeckAkhir),
-    Kartu = kartu(Warna, Angka),
-    integer(Angka),
-    assertz(discardTop(Kartu)),
-    assertz(warnaAktif(Warna)).
+    ambilElemen(DeckAwal, Kartu, SisaDeck),
+    (
+        Kartu = kartu(Warna, Angka),
+        integer(Angka)
+        ->
+        assertz(discardTop(Kartu)),
+        assertz(warnaAktif(Warna)),
+        DeckAkhir = SisaDeck
+        ;
+        initDiscard(SisaDeck, DeckAkhir)
+    ).
 
 /* Ambil Kartu ke-N */
 ambilKartuKe(1, [H|T], H, T).
@@ -103,7 +118,8 @@ ambilKartuKe(N, [H|T], Kartu, [H|Sisa]) :-
 
 /* Cek Kartu Valid */
 kartuValid(kartu(hitam,_), _).
-kartuValid(kartu(Warna,_), kartu(Warna,_)).
+kartuValid(kartu(Warna,_), _) :-
+    warnaAktif(Warna).
 kartuValid(kartu(_,Jenis), kartu(_,Jenis)).
 
 /* Tampilkan Satu Kartu */
@@ -119,16 +135,10 @@ updateWarnaAktif(kartu(hitam,_)) :-
     read(WarnaBaru),
     retract(warnaAktif(_)),
     assertz(warnaAktif(WarnaBaru)).
-
 updateWarnaAktif(kartu(Warna,_)) :-
     Warna \= hitam,
     retract(warnaAktif(_)),
     assertz(warnaAktif(Warna)).
 
 /* fitur yg blm ada */
-% tambah kartu draw sama wild ke deck 
-% random ambilElemen
-% random deck 
-% validasi discard awal kalau bukan angka harus ambil ulang 
-% kartuValid brdasrkan warnaAktif 
 % nilai kartu hitam sm draw_two
