@@ -68,12 +68,10 @@ jalankanEfek(kartu(_, skip)) :- !,
     pemain(List),
     giliran(Sekarang),
     nextPlayer(List, Sekarang, Berikutnya),
-    nextPlayer(List, Berikutnya, SetelahBerikutnya),
     retract(giliran(Sekarang)),
-    assertz(giliran(SetelahBerikutnya)),
+    assertz(giliran(Berikutnya)),
 
-    write('Pemain'), write(Berikutnya), write(' telah di skip, lanjut ke pemain'),
-    write(SetelahBerikutnya), nl.
+    write('Pemain'), write(Berikutnya), write(' telah di skip'), nl.
 /*Penjelasan: List berisi daftar pemain dan 'Sekarang' menyatakan giliran pemain sekarang.
 Diarah pakai nextPlayer. */
 
@@ -132,14 +130,14 @@ tambahKartu(Pemain, N) :-
     N > 0,
     retract(deckAktif([H|T])),
     assertz(deckAktif(T)),
-    kartuPemain(P, ListLama),
+    kartuPemain(Pemain, ListLama),
     retract(kartuPemain(Pemain, _)),
     assertz(kartuPemain(Pemain, [H|ListLama])),
     N1 is N - 1,
     tambahKartu(Pemain, N1).
 /*Penjelasan: menambahkan kartu sebanyak N ke Pemain.*/
 %Helper ngecek warna
-cekAdaWarna([kartu(Warna, _|_), Warna]) :- !. /*Kalo ada warna di head*/
+cekAdaWarna([kartu(Warna, _)|_], Warna) :- !. /*Kalo ada warna di head*/
 cekAdaWarna([_|SisaKartu], Warna) :- cekAdaWarna(SisaKartu, Warna).
 
 %Helper ngecek pemain sebelumnya
@@ -153,7 +151,7 @@ tantang :-
     pemain(List),
 
     prevPlayer(List, Target, Penantang),
-    discardTop(wild_draw_four),
+    discardTop(kartu(hitam, wild_draw_four)),
     warnaLama(W),
     kartuPemain(Target, ListKartu),
     eksekusi(Penantang, Target, ListKartu, W).
@@ -192,8 +190,8 @@ uni(_) :-
 %tangkap
 tangkap(Target) :- 
     kartuPemain(Target, L),
-    length(L, 1),
-    \+ member(Target, StatusUNI), !,
+    length(L, 1), statusUNI(StatusList),
+    \+ member(Target, StatusList), !,
     write(Target), write(' tertangkap basah lupa berteriak UNI!'), nl,
     write('Mendapat penalti 2 kartu'),
     tambahKartu(Target, 2),
