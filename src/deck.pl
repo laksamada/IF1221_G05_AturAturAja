@@ -144,5 +144,14 @@ updateWarnaAktif(kartu(Warna,_)) :-
     retract(warnaAktif(_)),
     assertz(warnaAktif(Warna)).
 
-/* fitur yg blm ada */
-% nilai kartu hitam sm draw_two
+/* Fitur Nilai Setiap Kartu */
+nilaiKartu(0, 1).
+nilaiKartu(Angka, Angka) :-
+    integer(Angka),
+    Angka \= 0.
+nilaiKartu(skip, 10).
+nilaiKartu(reverse, 10).
+nilaiKartu(draw_two, 10).
+nilaiKartu(wild, 20).
+nilaiKartu(wild_draw_four, 20).
+nilaiKartu(mimic, 20).
