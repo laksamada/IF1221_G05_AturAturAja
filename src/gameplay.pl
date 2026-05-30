@@ -89,11 +89,13 @@ cekHasil:-
     printList(R).
 
 /* fitur yg belum ada */
+% ambilKartu dari deckAktif */
 ambilKartu :-
     giliran(P),
     deckAktif([KartuBaru|SisaDeck]),
     retract(deckAktif(_)),
     assertz(deckAktif(SisaDeck)),
+
     kartuPemain(P, ListLama),
     retract(kartuPemain(P, _)),
     assertz(kartuPemain(P, [KartuBaru|ListLama])),
@@ -102,7 +104,6 @@ pemain di bagian head.*/
     hapusUNI(P),
     write('Kamu ngambil kartu dari deck kartu!'), nl,
     nextTurn.
-    
 % efek skip 
 jalankanEfek(kartu(_, skip)) :- !,
     pemain(List),
@@ -121,6 +122,8 @@ jalankanEfek(kartu(_,reverse)) :- !,
     write('KARTU REVERSE DIMAINKAN!'), nl,
     write('Arah permainan dibalik!'), nl.
 /*Penjelasan: ListLama berisi daftar pemain sekarang, pakai fungsi bawaan reverse buat nuker urutan dengan ListBaru*/
+
+
 
 % efek draw_two 
 jalankanEfek(kartu(_,draw_two)) :- !,
@@ -215,6 +218,7 @@ cekAdaWarna([_|SisaKartu], Warna) :- cekAdaWarna(SisaKartu, Warna).
 lastElem([X], X).
 lastElem([_|T], X) :-
     lastElem(T, X).
+
 prevPlayer([X, Y|_], Y, X).
 prevPlayer([_|T], Y, X) :- prevPlayer(T, Y, X).
 prevPlayer([First|Rest], First, Last) :- lastElem([First|Rest], Last).
@@ -282,5 +286,4 @@ tangkap(_) :-
 /*Penjelasan: Jika pemain sebelumnya belum menyebutkan uni padahal kartunya telah bersisa 1, maka bisa ditangkap.
 Tergantung apakah pemain yang ditangkap telah masuk ke statusUNI atau tidak. Akan ada penalti bagi penangkap jika
 salah.*/
-
 
