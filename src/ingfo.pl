@@ -33,7 +33,7 @@ cekInfo :-
 tampilkanInfoPemain([], _).
 tampilkanInfoPemain([P|Tail], Nomor) :-
     kartuPemain(P, ListKartu),
-    length(ListKartu, Jumlah),
+    len(ListKartu, Jumlah),
     write('Nama pemain '),
     write(Nomor),
     write(': '),
@@ -56,15 +56,64 @@ sumPlayer(Pemain,X):-
     sumListKartu(ListKartu,X).
 
 sumListKartu([],0).
+sumListKartu([kartu(_,0)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 1.
+sumListKartu([kartu(_,Angka)|Tail],X):-
+    integer(Angka),
+    Angka > 0,
+    sumListKartu(Tail,X1),
+    X is X1 + Angka.
 sumListKartu([kartu(_,skip)|Tail],X):-
     sumListKartu(Tail,X1),
     X is X1 + 10.
 sumListKartu([kartu(_,reverse)|Tail],X):-
     sumListKartu(Tail,X1),
     X is X1 + 10.
-sumListKartu([kartu(_,Jenis)|Tail],X):-
+sumListKartu([kartu(_,draw_two)|Tail],X):-
     sumListKartu(Tail,X1),
-    X is X1 + Jenis.
+    X is X1 + 10.
+sumListKartu([kartu(_,wild)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 20.
+sumListKartu([kartu(_,wild_draw_four)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 20.
+sumListKartu([kartu(_,mimic)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 20.
+
+printKartuPoin([]).
+printKartuPoin([kartu(W,J)]) :-
+    write(W),
+    write('-'),
+    write(J).
+printKartuPoin([kartu(W,J)|T]) :-
+    write(W),
+    write('-'),
+    write(J),
+    write(' + '),
+    printKartuPoin(T).
+printPoinPemain(Pemain) :-
+    kartuPemain(Pemain,List),
+    write(Pemain),
+    write(': '),
+    (
+        List = []
+        ->
+        write('kartu habis = 0 poin')
+        ;
+        printKartuPoin(List),
+        sumListKartu(List,Poin),
+        write(' = '),
+        write(Poin),
+        write(' poin')
+    ),
+    nl.
+printSemuaPoin([]).
+printSemuaPoin([P|T]) :-
+    printPoinPemain(P),
+    printSemuaPoin(T).
 
 insert_sort([], []).
 insert_sort([X], [X]).
@@ -94,7 +143,16 @@ setat(Item,[H|T],[H|Result]):-
     N > M,
     setat(Item,T,Result).
 
-
+cekAdaExit :-
+    giliran(X),
+    kartuPemain(X, ListKartu),
+    ListKartu = [],
+    !,
+    nl,
+    write('game selesai'), nl,
+    write('urutan pemain: '), nl,
+    cekHasil,
+    clearGame.
 
 sumAll([H|ListPemain],Awal,X):-
     sumPlayer(H,SumKartu),
@@ -121,6 +179,11 @@ sort_with_id(N, Ids, S) :-
     insert_sort(P, SP),
     get_ids(SP, S).
 
+cekHasil:-
+    sumAllPlayer(X),
+    pemain(Y),
+    sort_with_id(X,Y,R),
+    printList(R).
 
 printList([]).
 printList([H|T]):-
