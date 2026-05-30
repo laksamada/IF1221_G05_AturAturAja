@@ -130,7 +130,7 @@ jalankanEfek(kartu(hitam,wild)) :-!,
 /*Penjelasan: pemain milih warna yang diinginkan dan masukin ke warnaBaru lalu ngeganti isi warnaAktif. */
 
 % efek wild_draw_four
-jalankanEfek(kartu(hitam,draw_four)) :- !,
+jalankanEfek(kartu(hitam, wild_draw_four)) :- !,
     write('Pilih warna baru(merah, kuning, hijau, biru): '),
     read(WarnaBaru),
     retract(warnaAktif(_)),
