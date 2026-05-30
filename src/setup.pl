@@ -7,6 +7,7 @@
 :- dynamic(arahPermainan/1).
 :- dynamic(statusUNI/1).
 :- dynamic(deckAktif/1).
+:- dynamic(warnaLama/1).
 
 /* Mulai Permainan */
 startGame :-
@@ -58,32 +59,15 @@ inputPemain(N, SudahAda, [Nama1|Tail]) :-
         Tail
     ).
 
-
-
 /* cek apakah nama sudah ada di list,minta masukan ulang jika sudah ada*/
 cekNama(Nama,List,Result):-
-    anggotaList(Nama,List),
+    member(Nama,List),
     write('Nama Sudah Digunakan. Masukkan nama lain: '),
     read(Nama1),
     cekNama(Nama1,List,Result).
 
 cekNama(Nama,List,Nama):-
-    \+ anggotaList(Nama,List).
-
-/* Acak urutan pemain */
-acakList([], []).
-acakList(List, [Pilihan|TailAcak]) :-
-    panjangList(List, Panjang),
-    BatasAtas is Panjang + 1,
-    random(1, BatasAtas, Index),
-    ambilElemenKe(Index, List, Pilihan, Sisa),
-    acakList(Sisa, TailAcak).
-
-ambilElemenKe(1, [H|T], H, T) :- !.
-ambilElemenKe(N, [H|T], Pilihan, [H|Sisa]) :-
-    N > 1,
-    N1 is N - 1,
-    ambilElemenKe(N1, T, Pilihan, Sisa).
+    \+ member(Nama,List).
 
 clearGame :-
     retractall(pemain(_)),
@@ -93,7 +77,8 @@ clearGame :-
     retractall(arahPermainan(_)),
     retractall(statusUNI(_)),
     retractall(kartuPemain(_,_)),
-    retractall(deckAktif(_)).
+    retractall(deckAktif(_)),
+    retractall(warnaLama(_)).
 
 
 hapusSemua(_, [], []).
