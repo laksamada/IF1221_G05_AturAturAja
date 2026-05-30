@@ -22,7 +22,9 @@ tulisState(Stream) :-
     warnaAktif(WA),
     tulisBaris(Stream, 'warna_aktif', WA),
     statusUNI(SU),
-    tulisBaris(Stream, 'status_UNI', SU).
+    tulisBaris(Stream, 'status_UNI', SU),
+    deckAktif(Deck),
+    tulisBaris(Stream, 'deck_aktif', Deck).
 
 tulisBaris(Stream, Key, Value) :-
     write(Stream, Key),
@@ -128,6 +130,8 @@ handleKV(warna_aktif, Warna) :- !,
     assertz(warnaAktif(Warna)).
 handleKV(status_UNI, List) :- !,
     assertz(statusUNI(List)).
+handleKV(deck_aktif, Deck) :- !,
+    assertz(deckAktif(Deck)).
 handleKV(Key, ListPair) :-
     atom_concat('kartu_', Pemain, Key), !,
     konvListPairToKartu(ListPair, ListKartu),
