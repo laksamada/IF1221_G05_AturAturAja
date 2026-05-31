@@ -8,11 +8,11 @@
 :- dynamic(statusUNI/1).
 :- dynamic(deckAktif/1).
 :- dynamic(warnaLama/1).
+:- dynamic(riwayatAksi/1).
 
 /* Mulai Permainan */
 startGame :-
     clearGame,
-
     bacaJumlahPemain(Jumlah),
     inputPemain(Jumlah, [], ListInput),
     acakList(ListInput, ListPemain),
@@ -21,14 +21,15 @@ startGame :-
     assertz(giliran(First)),
     assertz(arahPermainan(kanan)),
     assertz(statusUNI([])),
+    assertz(riwayatAksi([])),
     deck(DeckAwal),
     bagiSemua(ListPemain, DeckAwal, DeckSisa),
     initDiscard(DeckSisa, DeckAkhir),
     assertz(deckAktif(DeckAkhir)),
     write('Game berhasil dimulai.'), nl,
-    pemain(X),write('Urutan paermainanya adalah:'),write(X),nl,
-    discardTop(Y),write('Kartu Top pertama: '),write(Y),nl,
-    giliran(Z),write('Giliran '),write(Z),nl, !.
+    pemain(X), write('Urutan pemainnya adalah: '), write(X), nl,
+    discardTop(Y), write('Kartu Top pertama: '), write(Y), nl,
+    giliran(Z), write('Giliran '), write(Z), nl, !.
 
 /* Validasi Jumlah Pemain */
 bacaJumlahPemain(Jumlah) :-
@@ -50,24 +51,18 @@ inputPemain(N, SudahAda, [Nama1|Tail]) :-
     N > 0,
     write('Masukkan nama pemain: '),
     read(Nama),
-    cekNama(Nama,SudahAda,Nama1),
-
+    cekNama(Nama, SudahAda, Nama1),
     N1 is N - 1,
-    inputPemain(
-        N1,
-        [Nama1|SudahAda],
-        Tail
-    ).
+    inputPemain(N1, [Nama1|SudahAda], Tail).
 
-/* cek apakah nama sudah ada di list,minta masukan ulang jika sudah ada*/
-cekNama(Nama,List,Result):-
-    member(Nama,List),
+cekNama(Nama, List, Result) :-
+    member(Nama, List),
     write('Nama Sudah Digunakan. Masukkan nama lain: '),
     read(Nama1),
-    cekNama(Nama1,List,Result).
+    cekNama(Nama1, List, Result).
 
-cekNama(Nama,List,Nama):-
-    \+ member(Nama,List).
+cekNama(Nama, List, Nama) :-
+    \+ member(Nama, List).
 
 clearGame :-
     retractall(pemain(_)),
@@ -78,8 +73,8 @@ clearGame :-
     retractall(statusUNI(_)),
     retractall(kartuPemain(_,_)),
     retractall(deckAktif(_)),
-    retractall(warnaLama(_)).
-
+    retractall(warnaLama(_)),
+    retractall(riwayatAksi(_)).
 
 hapusSemua(_, [], []).
 hapusSemua(X, [X|Tail], Hasil) :- !,
@@ -87,8 +82,6 @@ hapusSemua(X, [X|Tail], Hasil) :- !,
 hapusSemua(X, [H|Tail], [H|Hasil]) :-
     hapusSemua(X, Tail, Hasil).
 
-
-/* Helper list buatan sendiri */
 anggotaList(X, [X|_]).
 anggotaList(X, [_|Tail]) :-
     anggotaList(X, Tail).
@@ -103,9 +96,8 @@ panjangList([_|Tail], Panjang) :-
     panjangList(Tail, PanjangTail),
     Panjang is PanjangTail + 1.
 
-/* fitur yg belum ada */
-% selesai: validasi jumlah pemain (2-4)
-% selesai: random urutan pemain
-% selesai: simpan deck sisa ke deckAktif
-% selesai: validasi nama player mendukung kapital
-% selesai: uni dan tangkap
+
+acakList([], []).
+acakList(List, [Elemen|Sisa]) :-
+    ambilElemen(List, Elemen, ListSisa),
+    acakList(ListSisa, Sisa).

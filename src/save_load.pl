@@ -24,7 +24,11 @@ tulisState(Stream) :-
     statusUNI(SU),
     tulisBaris(Stream, 'status_UNI', SU),
     deckAktif(Deck),
-    tulisBaris(Stream, 'deck_aktif', Deck).
+    tulisBaris(Stream, 'deck_aktif', Deck),
+    (   riwayatAksi([PemainAksi-kartu(WA2,JA)|_])
+    ->  tulisBaris(Stream, 'kartu_aksi_terakhir', PemainAksi-(WA2-JA))
+    ;   tulisBaris(Stream, 'kartu_aksi_terakhir', tidak_ada)
+    ).
 
 tulisBaris(Stream, Key, Value) :-
     write(Stream, Key),
@@ -49,7 +53,6 @@ tulisSemuaKartu(_, []).
 tulisSemuaKartu(Stream, [P|Sisa]) :-
     tulisKartuPemain(Stream, P),
     tulisSemuaKartu(Stream, Sisa).
-
 
 loadGame :-
     write('Masukkan nama file yang akan dimuat: '),
@@ -78,7 +81,8 @@ bersihkanState :-
     retractall(discardTop(_)),
     retractall(arahPermainan(_)),
     retractall(warnaAktif(_)),
-    retractall(statusUNI(_)).
+    retractall(statusUNI(_)),
+    retractall(riwayatAksi(_)).
 
 bacaSemuaBaris(Stream) :-
     bacaLine(Stream, Line),
@@ -132,6 +136,10 @@ handleKV(status_UNI, List) :- !,
     assertz(statusUNI(List)).
 handleKV(deck_aktif, Deck) :- !,
     assertz(deckAktif(Deck)).
+handleKV(kartu_aksi_terakhir, tidak_ada) :- !,
+    assertz(riwayatAksi([])).
+handleKV(kartu_aksi_terakhir, Pemain-(W-J)) :- !,
+    assertz(riwayatAksi([Pemain-kartu(W,J)])).
 handleKV(Key, ListPair) :-
     atom_concat('kartu_', Pemain, Key), !,
     konvListPairToKartu(ListPair, ListKartu),
