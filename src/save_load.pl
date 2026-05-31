@@ -33,7 +33,7 @@ tulisState(Stream) :-
 tulisBaris(Stream, Key, Value) :-
     write(Stream, Key),
     write(Stream, ':'),
-    write(Stream, Value),
+    writeq(Stream, Value),
     nl(Stream).
 
 konvKartu(kartu(W,J), W-J).
