@@ -26,7 +26,10 @@ cekInfo :-
     nl,
     pemain(ListPemain),
     write('Urutan pemain: '),
-    write(ListPemain),
+    write(ListPemain),nl,
+    arahPermainan(Arah),
+    write('Arah permainan: '),write(Arah),nl,
+    giliran(A),write('Giliran: '),write(A),
     nl, nl,
     tampilkanInfoPemain(ListPemain, 1).
 
@@ -59,11 +62,33 @@ sumListKartu([],0).
 sumListKartu([kartu(_,0)|Tail],X):-
     sumListKartu(Tail,X1),
     X is X1 + 1.
-sumListKartu([kartu(_,Angka)|Tail],X):-
-    integer(Angka),
-    Angka > 0,
+sumListKartu([kartu(_,1)|Tail],X):-
     sumListKartu(Tail,X1),
-    X is X1 + Angka.
+    X is X1 + 1.
+sumListKartu([kartu(_,2)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 2.
+sumListKartu([kartu(_,3)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 3.
+sumListKartu([kartu(_,4)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 4.
+sumListKartu([kartu(_,5)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 5.
+sumListKartu([kartu(_,6)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 6.
+sumListKartu([kartu(_,7)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 7.
+sumListKartu([kartu(_,8)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 8.
+sumListKartu([kartu(_,9)|Tail],X):-
+    sumListKartu(Tail,X1),
+    X is X1 + 9.
 sumListKartu([kartu(_,skip)|Tail],X):-
     sumListKartu(Tail,X1),
     X is X1 + 10.
@@ -150,6 +175,10 @@ cekAdaExit :-
     !,
     nl,
     write('game selesai'), nl,
+    write('Berikut perhitungan poin sisa kartu.'), nl,
+    pemain(ListPemain),
+    printSemuaPoin(ListPemain),
+    nl,
     write('urutan pemain: '), nl,
     cekHasil,
     clearGame.

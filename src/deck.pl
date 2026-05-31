@@ -104,7 +104,7 @@ initDiscard(DeckAwal, DeckAkhir) :-
     ambilElemen(DeckAwal, Kartu, SisaDeck),
     (
         Kartu = kartu(Warna, Angka),
-        integer(Angka)
+        angkaKartu(Angka)
         ->
         assertz(discardTop(Kartu)),
         assertz(warnaAktif(Warna)),
@@ -112,6 +112,17 @@ initDiscard(DeckAwal, DeckAkhir) :-
         ;
         initDiscard(SisaDeck, DeckAkhir)
     ).
+
+angkaKartu(0).
+angkaKartu(1).
+angkaKartu(2).
+angkaKartu(3).
+angkaKartu(4).
+angkaKartu(5).
+angkaKartu(6).
+angkaKartu(7).
+angkaKartu(8).
+angkaKartu(9).
 
 /* Ambil Kartu ke-N */
 ambilKartuKe(1, [H|T], H, T).
@@ -121,7 +132,14 @@ ambilKartuKe(N, [H|T], Kartu, [H|Sisa]) :-
     ambilKartuKe(N1, T, Kartu, Sisa).
 
 /* Cek Kartu Valid */
-kartuValid(kartu(hitam,_), _).
+kartuValid(kartu(_,draw_two), kartu(_,draw_two)) :- !, fail.
+kartuValid(kartu(Warna,draw_two), kartu(Warna,_)) :- !.
+kartuValid(kartu(hitam,wild), kartu(hitam,wild)) :- !, fail.
+kartuValid(kartu(hitam,wild), _) :- !.
+kartuValid(kartu(hitam,wild_draw_four), kartu(hitam,wild_draw_four)) :- !, fail.
+kartuValid(kartu(hitam,wild_draw_four), _) :- !.
+kartuValid(kartu(hitam,mimic), kartu(hitam,mimic)) :- !, fail.
+kartuValid(kartu(hitam,mimic), _) :- !.
 kartuValid(kartu(Warna,_), _) :-
     warnaAktif(Warna).
 kartuValid(kartu(_,Jenis), kartu(_,Jenis)).
@@ -134,11 +152,7 @@ tampilkanSatuKartu(kartu(Warna,Jenis)) :-
     nl.
 
 /* Update Warna Aktif */
-updateWarnaAktif(kartu(hitam,_)) :-
-    write('Pilih warna aktif: '),
-    read(WarnaBaru),
-    retract(warnaAktif(_)),
-    assertz(warnaAktif(WarnaBaru)).
+updateWarnaAktif(kartu(hitam,_)).
 updateWarnaAktif(kartu(Warna,_)) :-
     Warna \= hitam,
     retract(warnaAktif(_)),
@@ -146,9 +160,15 @@ updateWarnaAktif(kartu(Warna,_)) :-
 
 /* Fitur Nilai Setiap Kartu */
 nilaiKartu(0, 1).
-nilaiKartu(Angka, Angka) :-
-    integer(Angka),
-    Angka \= 0.
+nilaiKartu(1, 1).
+nilaiKartu(2, 2).
+nilaiKartu(3, 3).
+nilaiKartu(4, 4).
+nilaiKartu(5, 5).
+nilaiKartu(6, 6).
+nilaiKartu(7, 7).
+nilaiKartu(8, 8).
+nilaiKartu(9, 9).
 nilaiKartu(skip, 10).
 nilaiKartu(reverse, 10).
 nilaiKartu(draw_two, 10).

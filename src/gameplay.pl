@@ -67,7 +67,8 @@ lanjut :-
 /* Ambil Kartu dari deckAktif */
 ambilKartu :-
     giliran(P),
-    deckAktif([KartuBaru|SisaDeck]),
+    deckAktif(Deck),
+    ambilElemen(Deck, KartuBaru, SisaDeck),
     retract(deckAktif(_)),
     assertz(deckAktif(SisaDeck)),
     kartuPemain(P, ListLama),
@@ -134,9 +135,14 @@ jalankanEfek(kartu(hitam,wild_draw_four)) :- !,
 
 % efek mimic
 jalankanEfek(kartu(hitam, mimic)) :- !,
+    warnaAktif(WarnaSebelumnya),
+    write('Pilih warna baru(merah, kuning, hijau, biru): '),
+    read(WarnaBaru),
+    retract(warnaAktif(_)),
+    assertz(warnaAktif(WarnaBaru)),
     write('Menelusuri riwayat permainan...'), nl,
     cariAksiTerakhir(HasilCari),
-    jalankanMimic(HasilCari).
+    jalankanMimic(HasilCari, WarnaSebelumnya).
 
 % catch-all: kartu angka, tidak ada efek
 jalankanEfek(_) :- !.
@@ -149,27 +155,24 @@ cariAksiTerakhir(Pemain-Kartu) :-
 
 % Tidak ada riwayat aksi -> berlaku seperti wild
 % (warna sudah dipilih oleh updateWarnaAktif sebelum jalankanEfek)
-jalankanMimic(tidak_ada) :- !,
+jalankanMimic(tidak_ada, _) :- !,
     write('Belum ada kartu aksi sebelumnya.'), nl,
     write('Mimic berlaku seperti wild.'), nl,
     warnaAktif(W),
     write('Warna aktif sekarang: '), write(W), nl.
 
-% Ada riwayat aksi -> salin efeknya
-jalankanMimic(Pemain-kartu(Warna, Jenis)) :-
+jalankanMimic(Pemain-kartu(Warna, Jenis), WarnaSebelumnya) :-
     write('Kartu aksi terakhir yang dimainkan: '),
     write(Warna), write('-'), write(Jenis),
     write(' (oleh '), write(Pemain), write(')'), nl,
     write('Kartu mimic menyalin efek '), write(Jenis), write('!'), nl,
-    jalankanEfekMimic(kartu(Warna, Jenis)).
+    jalankanEfekMimic(kartu(Warna, Jenis), WarnaSebelumnya).
 
-% wild & wild_draw_four: warna sudah dipilih, tidak perlu prompt lagi
-jalankanEfekMimic(kartu(_, wild)) :- !,
+jalankanEfekMimic(kartu(_, wild), _) :- !,
     warnaAktif(W),
     write('Warna aktif sekarang: '), write(W), nl.
 
-jalankanEfekMimic(kartu(_, wild_draw_four)) :- !,
-    warnaAktif(WarnaSebelumnya),
+jalankanEfekMimic(kartu(_, wild_draw_four), WarnaSebelumnya) :- !,
     retractall(warnaLama(_)),
     assertz(warnaLama(WarnaSebelumnya)),
     warnaAktif(W),
@@ -182,8 +185,7 @@ jalankanEfekMimic(kartu(_, wild_draw_four)) :- !,
     assertz(giliran(Target)),
     write(Target), write(' mendapatkan 4 kartu dan kehilangan giliran!'), nl.
 
-% skip, reverse, draw_two: identik dengan jalankanEfek biasa
-jalankanEfekMimic(Kartu) :-
+jalankanEfekMimic(Kartu, _) :-
     jalankanEfek(Kartu).
 
 
@@ -196,10 +198,15 @@ kartuAksi(kartu(_, wild_draw_four)).
 
 catatAksi(Pemain, Kartu) :-
     kartuAksi(Kartu), !,
-    riwayatAksi(Lama),
+    catatAksiTerakhir(Pemain, Kartu).
+catatAksi(_, _).
+
+catatAksiTerakhir(Pemain, Kartu) :-
+    riwayatAksi(Lama), !,
     retract(riwayatAksi(Lama)),
     assertz(riwayatAksi([Pemain-Kartu|Lama])).
-catatAksi(_, _).
+catatAksiTerakhir(Pemain, Kartu) :-
+    assertz(riwayatAksi([Pemain-Kartu])).
 
 
 ubahArah :-
@@ -214,8 +221,10 @@ ubahArah :-
 tambahKartu(_, 0) :- !.
 tambahKartu(Pemain, N) :-
     N > 0,
-    retract(deckAktif([H|T])),
-    assertz(deckAktif(T)),
+    deckAktif(Deck),
+    ambilElemen(Deck, H, SisaDeck),
+    retract(deckAktif(_)),
+    assertz(deckAktif(SisaDeck)),
     kartuPemain(Pemain, ListLama),
     retract(kartuPemain(Pemain, _)),
     assertz(kartuPemain(Pemain, [H|ListLama])),
@@ -249,7 +258,8 @@ prevPlayer([First|Rest], First, Last) :- lastElem([First|Rest], Last).
 tantang :-
     giliran(Penantang),
     pemain(List),
-    prevPlayer(List, Target, Penantang),
+
+    prevPlayer(List, Penantang, Target),
     discardTop(kartu(hitam, wild_draw_four)),
     warnaLama(W),
     kartuPemain(Target, ListKartu),
@@ -267,8 +277,9 @@ eksekusi(Penantang, _, _, _) :-
 uni(Index) :-
     giliran(P),
     kartuPemain(P, List),
-    len(List, 2), !,
-    mainkanKartu(Index),
+    len(List, 2),
+    mainkanKartu(Index), !,
+
     retract(statusUNI(L)),
     assertz(statusUNI([P|L])),
     write(P),
@@ -285,9 +296,8 @@ uni(_) :-
 
 tangkap(Target) :-
     kartuPemain(Target, L),
-    len(L, 1),
-    statusUNI(StatusList),
-    \+ ada(Target, StatusList), !,
+    len(L, 1), statusUNI(StatusList),
+    \+ anggotaList(Target, StatusList), !,
     write(Target), write(' tertangkap basah lupa berteriak UNI!'), nl,
     write('Mendapat penalti 2 kartu'), nl,
     tambahKartu(Target, 2),
@@ -299,3 +309,6 @@ tangkap(_) :-
     write('Kamu salah tangkap! Mendapatkan penalti 1 kartu'), nl,
     tambahKartu(Penangkap, 1),
     nextTurn.
+/*Penjelasan: Jika pemain sebelumnya belum menyebutkan uni padahal kartunya telah bersisa 1, maka bisa ditangkap.
+Tergantung apakah pemain yang ditangkap telah masuk ke statusUNI atau tidak. Akan ada penalti bagi penangkap jika
+salah.*/

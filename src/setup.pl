@@ -43,7 +43,8 @@ bacaJumlahPemain(Jumlah) :-
     bacaJumlahPemain(Jumlah).
 
 validJumlahPemain(Jumlah) :-
-    Jumlah >= 2.
+    Jumlah >= 2,
+    Jumlah =< 4.
 
 /* Input Pemain */
 inputPemain(0, _, []).
@@ -55,14 +56,15 @@ inputPemain(N, SudahAda, [Nama1|Tail]) :-
     N1 is N - 1,
     inputPemain(N1, [Nama1|SudahAda], Tail).
 
-cekNama(Nama, List, Result) :-
-    member(Nama, List),
+/* cek apakah nama sudah ada di list,minta masukan ulang jika sudah ada*/
+cekNama(Nama,List,Result):-
+    anggotaList(Nama,List),
     write('Nama Sudah Digunakan. Masukkan nama lain: '),
     read(Nama1),
     cekNama(Nama1, List, Result).
 
-cekNama(Nama, List, Nama) :-
-    \+ member(Nama, List).
+cekNama(Nama,List,Nama):-
+    \+ anggotaList(Nama,List).
 
 clearGame :-
     retractall(pemain(_)),

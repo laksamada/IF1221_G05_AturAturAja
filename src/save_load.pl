@@ -82,6 +82,7 @@ bersihkanState :-
     retractall(arahPermainan(_)),
     retractall(warnaAktif(_)),
     retractall(statusUNI(_)),
+    retractall(deckAktif(_)),
     retractall(riwayatAksi(_)).
 
 bacaSemuaBaris(Stream) :-
@@ -112,7 +113,7 @@ bacaLineLanjut(Stream, C, [C|Rest]) :-
 prosesLine(Chars) :-
     splitDiTitikDua(Chars, KeyChars, ValueChars),
     atom_chars(Key, KeyChars),
-    append(ValueChars, ['.', ' '], ValueLengkap),
+    appends(ValueChars, ['.', ' '], ValueLengkap),
     open_input_chars_stream(ValueLengkap, S),
     read(S, Value),
     close_input_chars_stream(S),
